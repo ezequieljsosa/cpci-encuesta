@@ -1,0 +1,7 @@
+{
+	"nombre":"test1",
+	"preguntas": [
+		{"texto": "hola", "opciones": ["chau","hola"]},
+		{"texto": "que tal", "opciones": ["bien","mal"]}
+	]
+}
