@@ -1,5 +1,6 @@
 package ar.org.cpci.encuesta;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Encuesta {
@@ -7,6 +8,9 @@ public class Encuesta {
     private String nombre;
     private List<Pregunta> preguntas;
 
+    public Encuesta() {
+        this.preguntas = new ArrayList<>();
+    }
 
     public String getNombre() {
         return nombre;

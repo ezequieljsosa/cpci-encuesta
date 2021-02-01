@@ -1,31 +1,15 @@
 package ar.org.cpci.encuesta.repository;
 
 import ar.org.cpci.encuesta.Encuesta;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.io.*;
+import java.io.FileNotFoundException;
 
-public class EncuestaRepository {
+public interface EncuestaRepository {
 
-    private final File directory;
+    Encuesta findEncuestaByName(String encuestaName)
+            throws  EncuestaFindException;
 
-    public EncuestaRepository(File directory) {
-        this.directory = directory;
-    }
-
-    public Encuesta findEncuestaByName(String encuestaName)
-            throws FileNotFoundException, EncuestaFindException {
-        File f  = new File(this.directory.getAbsoluteFile() + "/" + encuestaName + ".json");
-        ObjectMapper objectMapper = new ObjectMapper();
-        try {
-            return objectMapper.readValue(f, Encuesta.class);
-         } catch (FileNotFoundException fileNotFoundException) {
-        throw  fileNotFoundException;
-        }     catch (IOException ioException) {
-                throw new EncuestaFindException(ioException);
-            }
-
-
-    }
+    void begin();
+    void end();
 
 }

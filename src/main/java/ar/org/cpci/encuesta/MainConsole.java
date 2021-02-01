@@ -1,19 +1,19 @@
 package ar.org.cpci.encuesta;
 
-import ar.org.cpci.encuesta.repository.EncuestaFindException;
-import ar.org.cpci.encuesta.repository.EncuestaRepository;
+import ar.org.cpci.encuesta.repository.*;
 
-import java.io.Console;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
 
 
-public class Main {
+public class MainConsole {
 
     public static void main(String [] args)  {
 
@@ -26,8 +26,25 @@ public class Main {
 
 
         // Carga de el/los repositorios y consola
+        EncuestaRepository repo = null;
+        //---------------------------------------
+//        repo = new EncuestaFileRepository(new File(dirEncuestas));
+        //---------------------------------------
+//        try {
+//            repo = new EncuestaJDBCRepository("jdbc:postgresql://localhost/cpci?user=postgres&password=123");
+//        } catch (SQLException throwables) {
+//            throwables.printStackTrace();
+//            System.err.println("No se pudo establecer la conección a la DB");
+//        }
+        //---------------------------------------
+        EntityManagerFactory emf = null; // persistance.xml
+        EntityManager em = emf.createEntityManager();
+        // Begin----
+        em.getTransaction().begin();
+        repo  = new EncuestaJPARepository(em);
 
-        EncuestaRepository repo = new EncuestaRepository(new File(dirEncuestas));
+        //---------------------------------------
+
         Scanner console = new Scanner(System.in);
 
 
@@ -35,21 +52,18 @@ public class Main {
         Encuesta encuesta = null;
         try {
             encuesta = repo.findEncuestaByName(nombreEncuesta);
-        } catch (FileNotFoundException fileNotFoundException) {
-            System.err.println( fileNotFoundException.getLocalizedMessage());
-            System.exit(1);
-        } catch (EncuestaFindException encuestaFindException) {
+        }  catch (EncuestaFindException encuestaFindException) {
             encuestaFindException.printStackTrace();
             System.err.println( "error reading json");
             System.exit(1);
         }
-        //
+        // Commit y Close
 
 
         List<Integer> respuestas = new ArrayList<Integer>();
 
         Iterator<Pregunta> iterator = encuesta.getPreguntas().iterator();
-
+        if (iterator.hasNext()){
         Pregunta pregunta = iterator.next();
         while (true) {
             System.err.println(pregunta.getTexto());
@@ -77,6 +91,9 @@ public class Main {
             }
 
         }
+        } else {
+            System.err.println("Encuesta Vacia!");
+        }
 
         System.out.println(  encuesta.getNombre() );
         respuestas.stream().forEach(x -> {
@@ -84,7 +101,7 @@ public class Main {
         });
 
 
-
+        // entityManager.close()
 
         System.err.println("programa terminado");
     }
