@@ -4,6 +4,7 @@ import ar.org.cpci.encuesta.Encuesta;
 
 import java.io.FileNotFoundException;
 import java.sql.*;
+import java.util.Collection;
 
 public class EncuestaJDBCRepository implements EncuestaRepository {
 
@@ -41,5 +42,10 @@ public class EncuestaJDBCRepository implements EncuestaRepository {
     @Override
     public void end() {
 
+    }
+
+    @Override
+    public Collection<Encuesta> all() {
+        return null;
     }
 }

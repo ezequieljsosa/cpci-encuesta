@@ -1,0 +1,49 @@
+<html>
+<head>
+    <link href="/public/bootstrap.min.css" rel="stylesheet"/>
+
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" crossorigin="anonymous"></script>
+
+    <script src="/public/bootstrap.min.js">
+
+    </script>
+
+</head>
+<body>
+
+<div class="container">
+
+
+    <h1>Encuesta: <span th:text="${encuesta.nombre}"></span></h1>
+
+    <div class="row">
+        <form method="POST">
+            <table>
+                <thead>
+                <tr>
+
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="preg: ${encuesta.preguntas}">
+                    <td>
+                        <span th:text="${preg.texto}"> una pregunta </span>
+                        <ul>
+                            <li th:each="option: ${preg.opciones}">
+                                <input th:name="${preg.texto} + '_' + ${option}" type="checkbox" th:text="${option}"> una opcion </input>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+<input type="submit" value="Finalizar"/>
+        </form>
+    </div>
+
+
+</div>
+
+</body>
+</html>

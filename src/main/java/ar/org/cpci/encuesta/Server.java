@@ -12,8 +12,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static spark.Spark.*;
 import static spark.Spark.get;
@@ -78,6 +77,21 @@ public class Server {
             public void end() {
 
             }
+
+            @Override
+            public Collection<Encuesta> all() {
+                ArrayList<Encuesta> encuestas = new ArrayList<>();
+                Encuesta e = new Encuesta();
+                e.setNombre("encuesta1");
+                encuestas.add(e);
+                e = new Encuesta();
+                e.setNombre("encuesta2");
+                encuestas.add(e);
+                e = new Encuesta();
+                e.setNombre("encuesta3");
+                encuestas.add(e);
+                return encuestas;
+            }
         };
     }
 
@@ -88,6 +102,14 @@ public class Server {
         staticFiles.externalLocation(projectDir + staticDir);
 
         ThymeleafTemplateEngine engine = new ThymeleafTemplateEngine();
+
+        get("/encuesta", (request, response) -> {
+            Map<String, Object> map = new HashMap<>();
+            EncuestaRepository repo = createEncuestaRepo();
+            Collection<Encuesta> encuestas = repo.all();
+            map.put("encuestas",encuestas);
+            return engine.render(new ModelAndView(map, "encuestas"));
+        });
 
         get("/encuesta/:name", (request, response) -> {
 
@@ -109,6 +131,41 @@ public class Server {
                     response.redirect("/encuesta");
                 }
                 return engine.render(new ModelAndView(map, "encuesta"));
+            } finally {
+                repo.end();
+            }
+        });
+
+        post("/encuesta/:name/responder", (request, response) -> {
+            HashMap<String,Object> data = new HashMap<>();
+//            List<String> respuestas = new ArrayList<>();
+            data.put("respuestas",request.body().split("&"));
+            // cuanto+es+2+%2B+2_4=on&cuanto+es+2+%2B+3_5=on
+
+
+            return engine.render(new ModelAndView(data, "contestarfinalizado"));
+        });
+
+        get("/encuesta/:name/responder", (request, response) -> {
+
+            //INIT
+            EncuestaRepository repo = createEncuestaRepo();
+            repo.begin();
+            try {
+                //INPUT
+                String name = request.params("name");
+                //Domain
+                Map<String, Object> map = new HashMap<>();
+                try {
+                    Encuesta pepe = repo.findEncuestaByName(name);
+                    //OUTPUT
+
+                    map.put("encuesta", pepe);
+
+                } catch (EncuestaFindException ex) {
+                    response.redirect("/encuesta");
+                }
+                return engine.render(new ModelAndView(map, "contestar"));
             } finally {
                 repo.end();
             }

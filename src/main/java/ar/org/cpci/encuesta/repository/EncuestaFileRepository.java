@@ -4,8 +4,9 @@ import ar.org.cpci.encuesta.Encuesta;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.*;
+import java.util.Collection;
 
-public class EncuestaFileRepository implements EncuestaRepository{
+public class EncuestaFileRepository implements EncuestaRepository {
 
     private final File directory;
 
@@ -36,6 +37,11 @@ public class EncuestaFileRepository implements EncuestaRepository{
     @Override
     public void end() {
 
+    }
+
+    @Override
+    public Collection<Encuesta> all() {
+        return null;
     }
 
 }

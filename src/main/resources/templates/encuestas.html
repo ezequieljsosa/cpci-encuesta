@@ -1,0 +1,12 @@
+<h1>Listado de encuestas:</h1>
+
+<table>
+    <thead>    <tr>   </tr>   </thead>
+    <tbody>
+    <tr th:each="encuesta: ${encuestas}">
+        <td>
+            <a  th:text="${encuesta.nombre}" th:href="'/encuesta/' + ${encuesta.nombre}" > una Encuesta </a>
+        </td>
+    </tr>
+    </tbody>
+</table>

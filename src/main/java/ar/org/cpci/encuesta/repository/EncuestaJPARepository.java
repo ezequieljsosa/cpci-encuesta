@@ -4,6 +4,7 @@ import ar.org.cpci.encuesta.Encuesta;
 import spark.Route;
 
 import javax.persistence.EntityManager;
+import java.util.Collection;
 
 public class EncuestaJPARepository implements  EncuestaRepository {
 
@@ -32,6 +33,11 @@ public class EncuestaJPARepository implements  EncuestaRepository {
     @Override
     public void end() {
         this.entityManager.close();
+    }
+
+    @Override
+    public Collection<Encuesta> all() {
+        return null;
     }
 
 
