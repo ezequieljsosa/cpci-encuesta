@@ -2,6 +2,7 @@ package ar.org.cpci.encuesta.repository;
 
 import ar.org.cpci.encuesta.Encuesta;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.*;
 import java.util.Collection;
@@ -41,7 +42,12 @@ public class EncuestaFileRepository implements EncuestaRepository {
 
     @Override
     public Collection<Encuesta> all() {
-        return null;
+        throw  new NotImplementedException();
+    }
+
+    @Override
+    public void save(Encuesta encuesta) {
+        throw  new NotImplementedException();
     }
 
 }

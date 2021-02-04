@@ -10,6 +10,8 @@ public interface EncuestaRepository {
     Encuesta findEncuestaByName(String encuestaName)
             throws  EncuestaFindException;
 
+    void save(Encuesta encuesta);
+
     void begin();
     void end();
 

@@ -1,6 +1,7 @@
 package ar.org.cpci.encuesta.repository;
 
 import ar.org.cpci.encuesta.Encuesta;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.FileNotFoundException;
 import java.sql.*;
@@ -46,6 +47,10 @@ public class EncuestaJDBCRepository implements EncuestaRepository {
 
     @Override
     public Collection<Encuesta> all() {
-        return null;
+        throw  new NotImplementedException();
+    }
+    @Override
+    public void save(Encuesta encuesta) {
+        throw  new NotImplementedException();
     }
 }

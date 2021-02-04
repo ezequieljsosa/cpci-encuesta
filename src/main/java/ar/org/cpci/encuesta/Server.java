@@ -20,79 +20,47 @@ import static spark.debug.DebugScreen.enableDebugScreen;
 
 public class Server {
 
-    private EncuestaRepository repo = null;
+    private static  EntityManagerFactory entityManagerFactory = null;
 
     public static void main(String[] args) {
         enableDebugScreen();
         port(4567);
+        initPersistance();
         initRoutes();
+    }
 
+    public static void initPersistance(){
+        entityManagerFactory = Persistence.createEntityManagerFactory("db");
+        EncuestaRepository repo = createEncuestaRepo();
+        repo.begin();
+        testData().stream().forEach(e-> repo.save(e));
+        repo.end();
+    }
 
+    public static List<Encuesta> testData(){
+        ArrayList<Encuesta> encuestas = new ArrayList<>();
+        Encuesta e = new Encuesta();
+        e.setNombre("encuesta1");
+        Pregunta p = new Pregunta();
+        p.setTexto("cuanto es 2 + 2");
+        p.getOpciones().add("4");
+        p.getOpciones().add("14");
+        e.getPreguntas().add(p);
+
+        encuestas.add(e);
+        e = new Encuesta();
+        e.setNombre("encuesta2");
+        encuestas.add(e);
+        p = new Pregunta();
+        p.setTexto("cuanto es 2 + 3");
+        p.getOpciones().add("5");
+        p.getOpciones().add("14");
+        e.getPreguntas().add(p);
+        return encuestas;
     }
 
     private static EncuestaRepository createEncuestaRepo() {
-
-        // Carga de el/los repositorios y consola
-
-        //---------------------------------------
-        //        repo = new EncuestaFileRepository(new File(dirEncuestas));
-        //---------------------------------------
-        //        try {
-        //            repo = new EncuestaJDBCRepository("jdbc:postgresql://localhost/cpci?user=postgres&password=123");
-        //        } catch (SQLException throwables) {
-        //            throwables.printStackTrace();
-        //            System.err.println("No se pudo establecer la conección a la DB");
-        //        }
-        //---------------------------------------
-//        EntityManagerFactory emf = Persistence.createEntityManagerFactory("db");
-//        EntityManager em = emf.createEntityManager();
-//        // Begin----
-//        em.getTransaction().begin();
-//        return new EncuestaJPARepository(em);
-        return new EncuestaRepository() {
-            @Override
-            public Encuesta findEncuestaByName(String encuestaName) throws EncuestaFindException {
-                Encuesta e = new Encuesta();
-                e.setNombre(encuestaName);
-                Pregunta p = new Pregunta();
-                p.setTexto("cuanto es 2 + 2");
-                p.getOpciones().add("4");
-                p.getOpciones().add("14");
-                e.getPreguntas().add(p);
-
-                p = new Pregunta();
-                p.setTexto("cuanto es 2 + 3");
-                p.getOpciones().add("5");
-                p.getOpciones().add("14");
-                e.getPreguntas().add(p);
-                return e;
-            }
-
-            @Override
-            public void begin() {
-
-            }
-
-            @Override
-            public void end() {
-
-            }
-
-            @Override
-            public Collection<Encuesta> all() {
-                ArrayList<Encuesta> encuestas = new ArrayList<>();
-                Encuesta e = new Encuesta();
-                e.setNombre("encuesta1");
-                encuestas.add(e);
-                e = new Encuesta();
-                e.setNombre("encuesta2");
-                encuestas.add(e);
-                e = new Encuesta();
-                e.setNombre("encuesta3");
-                encuestas.add(e);
-                return encuestas;
-            }
-        };
+        return new EncuestaJPARepository(entityManagerFactory.createEntityManager());
     }
 
     public static void initRoutes() {
@@ -121,17 +89,16 @@ public class Server {
                 String name = request.params("name");
                 //Domain
                 Map<String, Object> map = new HashMap<>();
-                try {
-                    Encuesta pepe = repo.findEncuestaByName(name);
-                    //OUTPUT
 
-                    map.put("encuesta", pepe);
+                Encuesta pepe = repo.findEncuestaByName(name);
+                //OUTPUT
+                map.put("encuesta", pepe);
 
-                } catch (EncuestaFindException ex) {
-                    response.redirect("/encuesta");
-                }
                 return engine.render(new ModelAndView(map, "encuesta"));
-            } finally {
+            } catch (EncuestaFindException e){
+                response.status(404);
+                return engine.render(new ModelAndView(new HashMap<>(), "page404"));
+            }   finally {
                 repo.end();
             }
         });
